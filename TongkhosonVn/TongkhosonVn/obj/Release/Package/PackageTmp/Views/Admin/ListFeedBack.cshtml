@@ -1,0 +1,68 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<FeedBack>
+@{
+    ViewBag.Title = "Danh sách phản hồi của khách hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách phản hồi của khách hàng</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateFeedBack","Admin")" type="button" class="btn btn-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm" id="TableList">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên khách hàng</th>
+            <th>Hình ảnh</th>
+            <th>Nội dung ngắn</th> 
+            <th>Hoạt động</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var feedBack in Model)
+        {
+            <tr id="row-@feedBack.ID">
+                <td>@feedBack.DisplayOrder</td>
+                <td>@feedBack.FullNname</td>
+                <td>
+                    @if (feedBack.Avatar != null)
+                    {
+                        <img src="~/Images/FeedBacks/@feedBack.Avatar" class="img-fluid" width="150" />
+                    }
+                </td>
+                <td>@feedBack.Description</td>
+                <td>@feedBack.Active</td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateFeedBack", "Admin", new {@id = feedBack.ID})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="DeleteFeedBack(@feedBack.ID)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+<script>
+    function DeleteFeedBack(feedBackID) {
+        if (confirm("Bạn có chắc muốn xóa banner đã chọn không?Xóa xong thì sẽ không thể khôi phục được!")) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/DeleteFeedBack",
+                data: { id: feedBackID },
+                success: function (res) {
+                    if (res) {
+                        alert("Xóa thành công!");
+                        $("#row-" + feedBackID).fadeOut();
+                    }
+                    else {
+                        alert("Bị lỗi!");
+                    }
+                }
+            })
+        }
+    }
+    </script>
+}

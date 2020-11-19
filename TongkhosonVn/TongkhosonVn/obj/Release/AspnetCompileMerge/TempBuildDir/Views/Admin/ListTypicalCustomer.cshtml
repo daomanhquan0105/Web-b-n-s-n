@@ -1,0 +1,79 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<TypicalCustomer>
+@{
+    ViewBag.Title = "Danh sách khách hàng tiêu biểu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách khách hàng tiêu biểu</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateTypicalCustomer","Admin")" type="button" class="btn btn-outline-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên khách hàng</th>
+            <th>Ảnh đại diện</th>  
+            <th>Hoạt động</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (TypicalCustomer customer in Model)
+        {
+            <tr id="row-@customer.Id">
+                <td>@customer.DisplayOrder</td>
+                <td>@customer.FullName</td>
+                <td>
+                    @if (customer.Avatar != null)
+                    {
+                        <img src="~/Images/TypicalCustomers/@customer.Avatar" style="width:100px" />
+                    }
+                </td>
+                <td>
+                    <input type="checkbox" name="FlagHome" checked="@customer.Active" onclick="CheckActive(@customer.Id)" />
+                </td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateTypicalCustomer", "Admin", new {@id = customer.Id})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="DeleteTypicalCustomer(@customer.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function DeleteTypicalCustomer(customerID) {
+            if (confirm("Bạn có chắc muốn xóa khách hàng tiêu biểu đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteTypicalCustomer",
+                    data: { id: customerID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + customerID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        } 
+        function CheckActive(customerID) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckActiveTypicalCustomer",
+                data: { id: customerID }
+            })
+        }
+    </script>
+}
+
+
+
+

@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css", "~/Content/Slick/css", "~/Content/Font/css/css", "~/Content/CustomerCss/css")
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    @Html.Action("HeaderPartial", "Home")
+    <div class="list-product">
+        <div class="container">
+            <div class="row no-gutter13">
+                <div class="col-lg-3 d-none d-lg-block">
+                    @Html.Action("MenuXLPartial", "Home")
+                </div>
+                <div class="col-12 col-lg-9">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Action("FooterPartial", "Home")
+    @Scripts.Render("~/bundles/jquery", "~/bundles/jqueryval", "~/bundles/bootstrap", "~/bundles/Slick/Script")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

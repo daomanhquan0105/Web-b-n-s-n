@@ -1,0 +1,50 @@
+﻿@using TongkhosonVn.ViewModel
+@model MenuXLViewModel
+
+<div class="d-none d-lg-block">
+    <ul class="menu-left">
+        <li class="list-title d-block d-xl-none">
+            <i class="fal fa-bars mr-3"></i>Tất cả danh mục
+        </li>
+        @foreach (var tradeMark in Model.TradeMarks)
+        {
+            <li>
+                <a href="@Url.Action("ListProduct","Home",new { name=Html.ConvertToUnSign(tradeMark.Name), tradeMarkId = tradeMark.Id })">
+                    <i class="fal fa-angle-right"></i> @tradeMark.Name
+                </a>
+                <ul>
+                    @foreach (var tag in tradeMark.ListTagProductCategory)
+                    {
+                        <li>
+                            <a href="@Url.Action("ListProduct","Home",new { productCategoryID =tag.ProductCategory.ID, name=Html.ConvertToUnSign(tradeMark.Name), tradeMarkId = tradeMark.Id })">
+                                @tag.ProductCategory.Name
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+    <div class="box-name mt-lg-4 mt-3">
+        BÀI ĐĂNG GẦN ĐÂY
+    </div>
+    @foreach (var post in Model.Posts)
+    {
+        <div class="media media-lastest-post">
+            @if (post.Image != null)
+            {
+                <a href="@Url.Action("PostDetail", "Home", new {id = post.Id, name = Html.ConvertToUnSign(post.Subject)})">
+                    <img src="~/Images/Posts/@post.Image" class="img-fluid" alt="@post.Subject" />
+                </a>
+            }
+            <div class="media-body">
+                <a href="@Url.Action("PostDetail", "Home", new {id = post.Id, name = Html.ConvertToUnSign(post.Subject)})">
+                    @post.Subject
+                </a>
+                <div class="date-post">
+                    <i class="far fa-calendar-alt"></i> @post.CreateDate.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+        </div>
+    }
+</div>

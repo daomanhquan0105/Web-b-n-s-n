@@ -1,0 +1,104 @@
+﻿@using PagedList.Mvc
+@model TongkhosonVn.ViewModel.ListPostAdminViewModel
+@{
+    ViewBag.Title = "Danh sách bài đăng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách bài đăng</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdatePost","Admin")" type="button" class="btn btn-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+
+@using (Html.BeginForm("ListPost", "Admin", FormMethod.Get))
+{
+    <div class="form-group form-row">
+        <div class="col-lg-3">
+            <label>Loại bài</label>
+            @Html.EnumDropDownListFor(a => a.Type, "Tất cả", new { @class = "form-control form-control-sm", data_item="type" })
+        </div>
+        <div class="col-lg-3">
+            <label>Danh mục cha</label>
+            @Html.DropDownListFor(a => a.CatId, Model.CategoryList, "Tất cả", new { @class = "form-control form-control-sm", data_item = "parent" })
+        </div>
+        <div class="col-lg-3">
+            <label>Danh mục con</label>
+            @Html.DropDownListFor(a => a.ChildId, Model.ChildList, "Tất cả", new { @class = "form-control form-control-sm", data_item = "child" })
+        </div>
+        <div class="col-lg-3">
+            <label>Từ khóa</label>
+            @Html.TextBoxFor(a => a.Name,new { @class = "form-control" })
+        </div>
+    </div>
+    <p><button type="submit" class="btn btn-sm btn-info">Tìm kiếm</button></p>
+}
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Ngày đăng</th>
+            <th>Hình ảnh</th>
+            <th>Tiêu đề</th>
+            <th>Loại mục</th>
+            <th>Danh mục</th>
+            <th>Hoạt động</th>
+            <th>Hiện trang chủ</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var post in Model.Posts)
+        {
+            <tr id="row-@post.Id">
+                <td>@post.DisPlayOrder</td>
+                <td>@post.CreateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    @if (post.Image != null)
+                    {
+                        <img src="~/Images/Posts/@post.Image" class="img-fluid" width="100" alt=""/>
+                    }
+                </td>
+                <td>@post.Subject</td>
+                <td>@post.PostCategory.TypeCategory</td>
+                <td>
+                    @(post.PostCategory.ParentCategory?.CategoryName) / @post.PostCategory.CategoryName
+                </td>
+                <td>@post.FlagHome</td>
+                <td>@post.Active</td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdatePost", "Admin", new {@id = post.Id})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="Deletepost(@post.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (Model.Posts.PageCount > 1)
+{
+    <div class="text-right">@Html.PagedListPager(Model.Posts, page => Url.Action("ListPost", new { page, catId = Model.CatId, childId = Model.ChildId, name = Model.Name, type = Model.Type }))</div>
+}
+@section scripts{
+    <script>
+        function Deletepost(postId) {
+            if (confirm("Bạn có chắc muốn xóa post đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeletePost",
+                    data: { id: postId },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + postId).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+}
+

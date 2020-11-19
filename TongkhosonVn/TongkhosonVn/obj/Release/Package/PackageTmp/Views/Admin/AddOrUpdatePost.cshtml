@@ -1,0 +1,154 @@
+﻿@model TongkhosonVn.ViewModel.AddPostViewModel
+
+@{
+    ViewBag.Title = Model.Post != null ? (Model.Post.Id > 0 ? "Cập nhật bài viết" : "Thêm mới bài viết") : "Thêm mới bài viết";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListPost","Admin")" class="btn btn-outline-info">
+        Danh sách bài viết
+    </a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdatePost","Admin")" method="post" enctype="multipart/form-data" class="mt-3">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Post.Id)
+        }
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.Subject, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.Subject)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.TypeCategory, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(a => a.TypeCategory, "Chọn loại bài viết", new { @class = "form-control", data_item = "type" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.CategoryId, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(a => a.CategoryId, Model.CategoryList, "Danh mục cha", new { @class = "form-control", data_item = "parent" })
+            </div>
+            <div class="col-md-5">
+                @Html.DropDownListFor(a => a.ChildId, Model.ChildList, "Danh mục con", new { @class = "form-control", data_item = "child" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.Description, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.Description)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.Content, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.Content)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.Image, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div id="LoadImages">
+                    <input class="picture" type="file" name="picture" onchange="loadFile(event)" />
+                </div>
+                <div id="images-group">
+                    <div class="row">
+                        @if (Model.Post?.Image != null)
+                        {
+                            <div class="multiple-images-wrapper col-md-2">
+                                <img src="@Path.Combine("/Images/Posts/",Model.Post.Image)" class="img-thumbnail" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.DisPlayOrder, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.DisPlayOrder)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.FlagHome, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.Post.FlagHome)
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.Active, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.Post.Active)
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.MetaTitle, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.MetaTitle)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Post.MetaDescription, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Post.MetaDescription)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-lg-10 offset-lg-2">
+                <button type="submit" id="btnSubmit" class="btn"></button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script>
+        if ($("#Post_Id").val() > 0) {
+            $("#title").html("Cập nhật bài viết");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary");
+        }
+        else {
+            $("#title").html("Thêm mới bài viết");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success");
+        }
+
+        function loadFile(event) {
+            var files = event.target.files;
+            var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+            if (files[0]["type"].length && !acceptFileTypes.test(files[0]["type"])) {
+                alert("Chỉ chấp nhận định dạng jpeg, jpg, png, gif");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            if (files[0]["size"] > 4000000) {
+                alert("Dung lượng ảnh lớn hơn 4MB");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            $("#images-group .row").html('<div class="multiple-images-wrapper col-md-2"><img src="' + URL.createObjectURL(event.target.files[0]) + '" class="img-thumbnail" /><a href="javascript:;" id="img-0" class="btn btn-outline-dark" onclick="deleteImage(0)"><span>x</span></a></div>');
+        }
+        function deleteImage(divid) {
+            if (confirm('Bạn có chắc xóa ảnh này?')) {
+                $('#img-' + divid).parent().fadeOut().remove();
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+            }
+        }
+    </script>
+}

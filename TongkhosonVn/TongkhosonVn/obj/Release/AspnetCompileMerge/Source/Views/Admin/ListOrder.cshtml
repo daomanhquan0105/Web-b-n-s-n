@@ -1,0 +1,153 @@
+﻿@using TongkhosonVn.Models;
+@*@using PagedList.Mvc
+@model PagedList.IPagedList<Order>*@
+
+@model IEnumerable<Order>
+@{
+    ViewBag.Title = "Danh sách các đơn đặt hàng của khách hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<h2>Danh sách các đơn đặt hàng của khách hàng</h2>
+
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm" id="table">
+    <thead>
+        <tr>
+            <th>
+                <a href="@Url.Action()">Sản phẩm</a>
+            </th>
+            <th>Hình ảnh</th>
+            <th>Thông tin đơn hàng</th>
+            <th>Tình trang đơn hàng</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Order order in Model)
+        {
+            <tr class="row-@order.ID">
+                <td>
+                    <p><strong>Tên sản phẩm: </strong>@order.Product.Name</p>
+                    <p><strong>Tên sản phẩm: </strong>@order.Product.Price.ToString("#,##")</p>
+                </td>
+                <td>
+                    @if (order.Product.Images != null)
+                    {
+                        <img src="~/Images/Products/@order.Product.Images.Split(';')[0]" class="img-fluid" width="200" />
+                    }
+                </td>
+                <td>
+                    <p><strong>Người mua</strong> @order.Member.FullName</p>
+                    <p><strong>Địa chỉ</strong> @order.Member.Address</p>
+                    <p><strong>Điện thoại</strong> @order.Member.Phone</p>
+                    <p><strong>Email</strong> @order.Member.Email</p>
+                    <p><strong>Ngày đặt:</strong> @order.CreateDate.ToString("dd/MM/yyyy")</p>
+                </td>
+                <td>
+                    <input type="checkbox" onclick="OrderStatus(@order.ID)" checked="@order.Status" />
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="DeleteOrder(@order.ID)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                    <a href="@Url.Action("OrderDetail","Admin",new { id=order.ID })" class="btn btn-success">
+                        <i class="far fa-bars"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        @*@if (Model.PageCount > 1)
+        {
+            <tr>
+                <td colspan="7">@Html.PagedListPager(Model, page => Url.Action("ListOrder", new { page }))</td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+
+
+
+@section scripts{
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script> 
+    <script>
+        $("#table").DataTable();
+        function DeleteOrder(orderID) {
+            if (confirm("Bạn có chắc muốn xóa hóa đơn đã chọn không?")) {
+                $.ajax({
+                    type: "post",
+                    url: "/Admin/DeleteOrder",
+                    data: { id: orderID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công");
+                            $(".row-" + orderID).fadeOut();
+                        }
+                    }
+                })
+            }
+        }
+
+        function Shipdate(orderID) {
+            $.ajax({
+                type: "post",
+                url: "/Admin/ShipDateOrder",
+                data: {
+                    id: orderID,
+                    shipDate: $("#input-" + orderID).val()
+                },
+                success: function (res) {
+                    if (res) {
+                        alert("Cập nhật hóa đơn thành công");
+                    }
+                    else {
+                        alert("Thất bại. Vui lòng thử lại");
+                    }
+                }
+            });
+        }
+        function OrderStatus(orderID) {
+            $.ajax({
+                type: "post",
+                url: "/Admin/OrderStatus",
+                data: { id: orderID },
+                success: function (res) {
+                    if (res) {
+                        alert("Cập nhật hóa đơn thành công");
+                    }
+                    else {
+                        alert("Thất bại. Vui lòng thử lại");
+                    }
+                }
+            });
+        }
+
+        function OrderAll() {
+            $.ajax({
+                type: "get",
+                url: "/Admin/OrderAllPartial",
+                success: function (data) {
+                    $("#body").html(data);
+                }
+            })
+        }
+        function OrderPaid() {
+            $.ajax({
+                type: "get",
+                url: "/Admin/OrderPaidPartial",
+                success: function (data) {
+                    $("#body").html(data);
+                }
+            })
+        }
+        function OrderUnPaid() {
+            $.ajax({
+                type: "get",
+                url: "/Admin/OrderUnPaidPartial",
+                success: function (data) {
+                    $("#body").html(data);
+                }
+            })
+        }
+    </script>
+
+}

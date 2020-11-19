@@ -1,0 +1,227 @@
+﻿@using TongkhosonVn.Models;
+@model Product
+
+@{
+    ViewBag.Title = Model != null ? (Model.Id != 0 ? "Cập nhật thông tin sản phẩm" : "Thêm mới sản phẩm") : "Thêm mới sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<ProductCategory> productCategories = ViewBag.ProductCategories;
+    IEnumerable<TradeMark> tradeMarks = ViewBag.ListTradeMark;
+}
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListProduct","Admin")" class="btn btn-outline-info">Danh sách sản phẩm</a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdateProduct","Admin")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name)
+            </div>
+        </div>
+
+        <div class="form-group row col-f">
+            @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Code)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.ProductCategoryID, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("ProductCategoryID", new SelectList(productCategories.OrderBy(x => x.DisplayOrder), "ID", "Name", "Chọn danh mục cho sản phẩm"), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.TradeMarkID, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("TradeMarkID", new SelectList(tradeMarks.OrderBy(x => x.DisplayOrder), "Id", "Name", "Chọn nhãn hiệu cho sản phẩm"), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Images, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div id="LoadImages">
+                    <input class="picture" type="file" name="pictures" onchange="loadFile(event)" multiple />
+                </div>
+                <ul id="sortable">
+                    @if (Model != null)
+                    {
+                        if (Model.Id > 0)
+                        {
+                            @Html.Partial("DeleteImageProduct", Model)
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Price)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.OriginalPrice, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.OriginalPrice)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Quantity)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Warranty, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Warranty)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.DisplayOrder, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DisplayOrder)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Detail, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Detail)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col">
+                @Html.EditorFor(model => model.Active)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.FlagHome, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col">
+                @Html.EditorFor(model => model.FlagHome)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col">
+                <button type="submit" id="btnSubmit" class="btn"></button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section scripts{
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật sản phẩm");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary")
+        }
+        else {
+            $("#title").html("Thêm mới sản ph");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success")
+        }
+
+        function loadFile(event) {
+            $(this).parent().addClass("plusItem");
+            var files = event.target.files;
+            var totalImg = $("#images-group .row .multiple-images-wrapper").length;
+            if (totalImg >= 10) {
+                alert("Chỉ đăng tối đa 10 ảnh");
+                $("#LoadImages .picture").addClass(" remove");
+                $("#LoadImages .picture.display").removeClass("remove");
+                $("#LoadImages .picture.remove").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="pictures" onchange="loadFile(event)" multiple />')
+                return false;
+            }
+            var plusImage = totalImg + files.length;
+            if (plusImage >= 11) {
+                alert("Chỉ đăng tối đa 10 ảnh");
+                $("#LoadImages .picture").addClass(" remove");
+                $("#LoadImages .picture.display").removeClass("remove");
+                $("#LoadImages .picture.remove").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="pictures" onchange="loadFile(event)" multiple />')
+                return false;
+            }
+            var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+            for (var i = 0; i < files.length; i++) {
+                if (files[0]["type"].length && !acceptFileTypes.test(files[0]["type"])) {
+                    alert("Chỉ chấp nhận định dạng jpeg, jpg, png, gif");
+                    $("#LoadImages .picture").addClass(" remove");
+                    $("#LoadImages .picture.display").removeClass("remove");
+                    $("#LoadImages .picture.remove").remove();
+                    $("#LoadImages").append('<input type="file" class="picture" name="pictures" onchange="loadFile(event)" multiple />')
+                    return false;
+                }
+                if (files[0]["size"] > 4000000) {
+                    alert("Dung lượng ảnh lớn hơn 4MB");
+                    $("#LoadImages .picture").addClass(" remove");
+                    $("#LoadImages .picture.display").removeClass("remove");
+                    $("#LoadImages .picture.remove").remove();
+                    $("#LoadImages").append('<input type="file" class="picture" name="pictures" onchange="loadFile(event)" multiple />')
+                    return false;
+                }
+                $("#sortable").append('<li class="multiple-images-wrapper col-md-1"><img src="' + URL.createObjectURL(event.target.files[i]) + '" class="multipleImage img-thumbnail" /><a href="javascript:;" id="' + i + '" class="btn btn-outline-dark" onclick="deleteImage(' + i + ')">x</a></li>');
+            }
+            $("#LoadImages .picture").addClass("display");
+            $("#LoadImages").append('<input type="file" class="picture" name="pictures" onchange="loadFile(event)" multiple />')
+        }
+        function deleteImage(divid) {
+            if (confirm('Bạn có chắc xóa ảnh này?')) {
+                $('#' + divid).parent().fadeOut().remove();
+            }
+        }
+        function deleteImageProduct(productID, locationImage) {
+            if (confirm("Bạn có chắc muốn xóa ảnh này không")) {
+                $.ajax({
+                    type: "post",
+                    url: "/Admin/DeleteImageProduct",
+                    data: {
+                        productId: productID,
+                        locationImage: locationImage
+                    },
+                    success: function (res) {
+                        alert("Thành công!");
+                        $('#img-' + locationImage).parent().fadeOut().remove();
+                        $("#sortable").html(res);
+                    },
+                    error: function (err) {
+                        alert("Bị lỗi!");
+                    }
+                })
+            }
+        }
+        $("#sortable").sortable();
+        $("#sortable").disableSelection();
+    </script>
+}

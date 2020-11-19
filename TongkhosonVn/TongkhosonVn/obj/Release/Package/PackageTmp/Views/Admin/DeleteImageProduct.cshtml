@@ -1,0 +1,19 @@
+﻿@using TongkhosonVn.Models;
+@model Product
+
+
+@{
+    string[] lstImage = Model.Images.Split(';');
+    for (int i = 0; i < lstImage.Length - 1; i++)
+    {
+        if (lstImage[i] != null)
+        {
+            <li class="multiple-images-wrapper">
+                <img src="~/Images/Products/@lstImage[i]" class="multipleImage img-thumbnail" />
+                <a href="javascript:;" id="img-@i" class="btn btn-outline-dark" onclick="deleteImageProduct(@Model.Id,@i)">
+                    x
+                </a>
+            </li>
+        }
+    }
+}

@@ -1,0 +1,34 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<TradeMark>
+
+<ul class="accordion fade" id="menu-mobile">
+    <li class="text-right">
+        <a href="javascript:;" onclick="CloseMenuMobile()" class="btn btn-dark text-white">
+            x
+        </a>
+    </li>
+    <li>
+        <a href="#">Nhận tư vấn ngay: <br><span>0123-456-789</span></a>
+    </li>
+    <li class="list-title">
+        <i class="far fa-bars mr-3"></i>Tất cả danh mục
+    </li>
+    @foreach (TradeMark tradeMark in Model)
+    {
+        <li>
+            <a href="javascript:;" data-toggle="collapse" class="collapsed" data-target="#collapse-@tradeMark.Id" aria-expanded="true">
+                <i class="fad  mr-2"></i>  @tradeMark.Name
+            </a>
+            <ul id="collapse-@tradeMark.Id" class="collapse" data-parent="#menu-mobile">
+                @foreach (TagProductCategory tag in tradeMark.ListTagProductCategory)
+                {
+                    <li>
+                        <a href="@Url.Action("ListProduct","Home",new { productCategoryID=tag.ProductCategory.ID, name=Html.ConvertToUnSign(tradeMark.Name)})">
+                            @tag.ProductCategory.Name
+                        </a>
+                    </li> 
+                }
+            </ul>
+        </li>
+    }
+</ul>

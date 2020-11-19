@@ -1,0 +1,84 @@
+﻿@using TongkhosonVn.Models
+@model IEnumerable<LibraryImage>
+@{
+    ViewBag.Title = "Thư viện ảnh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Album ảnh</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateItemForAlbum","Admin")" type="button" class="btn btn-outline-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Ảnh đại diện</th>
+            <th>Tên album</th>
+            <th>Hoạt động</th>
+            <th>Hiện trang chủ</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var item in Model)
+        {
+            <tr id="row-@item.Id">
+                <td>@item.DisplayOrder</td>
+                <td>
+                    @if (item.Avatar != null)
+                    {
+                        <img src="@Path.Combine("/Images/albums/", item.Avatar.Split(',')[0])" style="width:100px" alt=""/>
+                    }
+                </td>
+                <td>@item.Name</td>
+                <td>
+                    <input type="checkbox" name="Active" checked="@item.Active" onclick="CheckActive(@item.Id)" />
+                </td>
+                <td>
+                    <input type="checkbox" name="FlagHome" checked="@item.FlagHome" onclick="CheckFlagHome(@item.Id)" />
+                </td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateItemForAlbum", "Admin", new {@id = item.Id})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="deleteAlbum(@item.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function deleteAlbum(id) {
+            if (confirm("Bạn có chắc muốn xóa khách hàng tiêu biểu đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteAlbum",
+                    data: { id: id },
+                    success: function(res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + id).fadeOut();
+                        } else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                });
+            }
+        }
+        function CheckActive(id) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckActiveItemAlbum",
+                data: { id: id }
+            });
+        } 
+        function CheckFlagHome(id) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckFlagHomeItemAlbum",
+                data: { id: id }
+            });
+        } 
+    </script>
+}

@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @*<meta name="viewport" content="width=device-width" />*@
+    @Styles.Render("~/Content/admincss")
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div id="left_menu_profile">
+        <div class="left_menu_profile">
+            <ul>
+                <li data-id="1">
+                    <a class="root"><span>Admin</span></a>
+                    <div class="sub hidden">
+                        @*<div class="first">@Html.ActionLink("Quản lý Admin", "ListUserRole", "Admin", null, new { @class = "text_link" })</div>*@
+                        <div>@Html.ActionLink("Đổi mật khẩu", "ChangePassWord", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Thông tin chung", "ListConfigSite", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Thoát hệ thống", "LogoutAction", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                <li data-id="3">
+                    <a class="root"><span>Quản lý Bài viết</span></a>
+                    <div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Quản lý danh mục", "ListPostCategory", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Thêm bài viết mới", "AddOrUpDatePost", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách bài viết", "ListPost", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                <li data-id="5">
+                    <a class="root"><span>Quản lý sản phẩm</span></a>
+                    <div class="sub hidden">
+                        <div>@Html.ActionLink("Quản lý danh mục", "ListProductCategory", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Quản lý nhãn hiệu", "ListTradeMark", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Thêm sản phẩm mới", "AddOrUpdateProduct", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách sản phẩm", "ListProduct", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+
+                <li data-id="7">
+                    <a class="root"><span>Quản lý thư viên ảnh</span></a><div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Thêm ảnh vào thư viên", "AddOrUpdateItemForAlbum", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách ảnh", "ListAlbumImage", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                <li data-id="8">
+                    <a class="root"><span>Khách hàng tiêu biểu</span></a><div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Thêm khách hàng", "AddOrUpdateTypicalCustomer", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách khách hàng", "ListTypicalCustomer", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                <li data-id="9">
+                    <a class="root"><span>Quản lý Quảng cáo</span></a><div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Thêm mới quảng cáo", "AddOrUpdateBanner", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách quảng cáo", "ListBanner", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                <li data-id="11">
+                    <a class="root"><span>Quản lý Liên hệ</span></a><div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Danh sách liên hệ", "ListContact", "Admin", null, new { @class = "text_link" })</div>
+                        <div>@Html.ActionLink("Danh sách đăng ký", "ListSubcribe", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>
+                @*<li data-id="13">
+                    <a class="root"><span>Quản lý đơn đặt hàng</span></a><div class="sub hidden">
+                        <div class="first">@Html.ActionLink("Danh sách đơn đặt hàng", "ListOrder", "Admin", null, new { @class = "text_link" })</div>
+                        <div></div>
+                    </div>
+                </li>*@
+            </ul>
+        </div>
+    </div>
+    <div id="content_center_right">
+        <div class="content_center_right">
+            @RenderBody()
+        </div>
+    </div>
+    @Scripts.Render("~/bundles/jquery", "~/bundles/bootstrap", "~/bundles/jqueryval", "~/bundles/jqueryui")
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ckeditor/adapters/jquery.js"></script>
+    <script src="~/Scripts/jquery.cookie-1.4.1.min.js"></script>
+    @RenderSection("scripts", false)
+    <script>
+        var leftMenuProfile = $.cookie("left_menu_profile");
+        if (leftMenuProfile == null) leftMenuProfile = "";
+        var arrMenu = leftMenuProfile.split('|');
+        for (var i = 0; i < arrMenu.length; i++) {
+            $("#left_menu_profile li[data-id='" + arrMenu[i] + "'] a.root").addClass("expand");
+            $("#left_menu_profile li[data-id='" + arrMenu[i] + "'] div").show();
+        }
+        $(".left_menu_profile li .root").click(function() {
+            $(this).parent().find(".sub").slideToggle(400);
+            $(this).parent().find(".root").toggleClass("expand");
+            var strTemp = $(this).parent().attr("data-id") + "|";
+            leftMenuProfile = leftMenuProfile.replace(strTemp, "");
+            if ($(this).hasClass("expand")) {
+                leftMenuProfile = leftMenuProfile + strTemp;
+            }
+            $.cookie("left_menu_profile", leftMenuProfile);
+        });
+        $("textarea.ckeditor").ckeditor();
+
+        $("[data-item=type]").on("change", function() {
+                const type = $(this).find("option:selected").val();
+                var items = [];
+                items.push("<option value=''>Chọn danh mục</option>");
+                $.getJSON("/Admin/GetCategoryByType",
+                    { type: type },
+                    function(data) {
+                        $.each(data,
+                            function(key, val) {
+                                items.push("<option value='" + val.Id + "'>" + val.CategoryName + "</option>");
+                            });
+                    }).then(function() {
+                    $("[data-item=parent]").html(items.join(""));
+                });
+            });
+        if ($("[data-item=child]").length > 0) {
+            $("[data-item=parent]").on("change",
+                function() {
+                    const type = $(this).find("option:selected").val();
+                    var items = [];
+                    items.push("<option value=''>Chọn danh mục</option>");
+                    $.getJSON("/Admin/GetCategoryByParent",
+                        { parentId: type },
+                        function(data) {
+                            $.each(data,
+                                function(key, val) {
+                                    items.push("<option value='" + val.Id + "'>" + val.CategoryName + "</option>");
+                                });
+                        }).then(function() {
+                        $("[data-item=child]").html(items.join(""));
+                    });
+                });
+        }
+    </script>
+</body>
+</html>

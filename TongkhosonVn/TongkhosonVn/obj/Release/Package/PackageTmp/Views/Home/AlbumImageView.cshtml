@@ -1,0 +1,28 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<LibraryImage>
+@{
+    ViewBag.Title = "Thư viện ảnh";
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i></a></li>
+    <li class="breadcrumb-item active">Thư viện ảnh nhà đẹp</li>
+</ul>
+<div class="row">
+    @foreach (var library in Model)
+    {
+        <div class="col-6 col-lg-4 mb-3">
+            <div class="card card-album">
+                @if (library.Avatar != null)
+                {
+                    <a href="@Url.Action("AlbumDetail", new{id = library.Id, name = Html.ConvertToUnSign(library.Name)})">
+                        <img src="@Path.Combine("/images/albums/", library.Avatar.Split(',')[0])" class="card-img-top" alt="@library.Name" />
+                    </a>
+                }
+                <div class="card-body">
+                    <a href="@Url.Action("AlbumDetail", new{id = library.Id, name = Html.ConvertToUnSign(library.Name)})">@library.Name</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,15 @@
+﻿@using TongkhosonVn.Models;
+@model TradeMark
+
+<div class="box-name d-flex justify-content-between align-items-center mt-lg-5 mt-4">
+    <h2>HỆ THỐNG SẢN PHẨM @Model.Name</h2>
+    <a href="@Url.Action("ListProduct","Home",new { tradeMarkID=Model.Id,name=Html.ConvertToUnSign(Model.Name) })" class="viewall">Xem tất cả <i class="fa fa-caret-right ml-1"></i></a>
+</div>
+<div class="row justify-content-center row-cols-lg-5 no-gutter8">
+    @foreach (var product in Model.Products.Take(5))
+    {
+        <div class="col-6 col-md-4 col-lg">
+            @Html.Partial("ProductCardPartial", product)
+        </div>
+    }
+</div>

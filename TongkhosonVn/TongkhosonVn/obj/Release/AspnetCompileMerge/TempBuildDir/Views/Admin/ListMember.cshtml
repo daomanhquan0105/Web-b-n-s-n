@@ -1,0 +1,86 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<Member>
+@{
+    ViewBag.Title = "Danh sách Khách hàng mua hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<h2>Danh sách Khách hàng mua hàng</h2>
+<br />
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th>Địa chỉ</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (Member member in Model)
+        {
+            <tr id="row-@member.Id">
+                <td>@member.FullName</td>
+                <td>@member.Phone</td>
+                <td>@member.Email</td>
+                <td>@member.Address</td>
+                <td>
+                    <button onclick="memberDetail(@member.Id)" class="btn btn-success" title="Xem chi tiết"><i class="far fa-bars"></i></button>
+                    <button class="btn btn-warning" onclick="Deletemember(@member.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button> 
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Thông tin liên hệ</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div> 
+@section scripts{
+    <script>
+        function Deletemember(memberID) {
+            if (confirm("Bạn có chắc muốn xóa liên hệ đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteMember",
+                    data: { id: memberID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + memberID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+        function memberDetail(memberID) {
+            $.ajax({
+                type: "Get",
+                url: "/Admin/MemberDetail",
+                data: { id: memberID },
+                success: function (data) {
+                    $("#staticBackdrop").modal("show");
+                    $("#modal-body").html(data);
+                }
+            })
+        } 
+    </script>
+}

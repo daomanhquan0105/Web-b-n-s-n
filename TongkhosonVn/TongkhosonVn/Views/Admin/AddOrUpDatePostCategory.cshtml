@@ -1,0 +1,87 @@
+﻿@using TongkhosonVn.Models;
+@model PostCategory
+
+@{
+    ViewBag.Title = Model != null ? (Model.Id > 0 ? "Cập nhật danh mục bài viết" : "Thêm mới danh mục bài viết") : "Thêm mới danh mục bài viết";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListPostCategory","Admin")" class="btn btn-outline-info">
+        Danh sách danh mục bài viết
+    </a>
+</p>
+
+<div class="box_content p-5">
+    <form action="@Url.Action("AddOrUpDatePostCategory","Admin")" method="post" enctype="multipart/form-data" class="mt-3">
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true)
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+        <div class="form-group row">
+            @Html.LabelFor(model => model.TypeCategory, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(model => model.TypeCategory, new { @class = "form-control", data_item = "type" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.ParentCategoryId, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(a=>a.ParentCategoryId, (SelectList)ViewBag.ParentList, "Danh mục cha", new { @class = "form-control", data_item = "parent" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.CategoryName, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CategoryName)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Url, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Url)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.DisplayOrder, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DisplayOrder)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.ShowMenu, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ShowMenu)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Active)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-lg-10 offset-lg-2">
+                <button type="submit" id="btnSubmit" class="btn"></button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts{
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật thể loại bài viết");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary")
+        } else {
+            $("#title").html("Thêm mới thể loại bài viết");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success");
+        }
+    </script>
+}

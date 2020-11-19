@@ -1,0 +1,62 @@
+﻿@using TongkhosonVn.ViewModel
+@using PagedList.Mvc
+
+@model ProductViewModel
+@{
+    ViewBag.Title = Model.ProductCategory.MetaTitle ?? Model.ProductCategory.Name + (Model.TradeMark != null ? " - " + Model.TradeMark?.Name : null);
+    ViewBag.Description = Model.ProductCategory.MetaDescription ?? Model.ProductCategory.Name;
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i></a></li>
+    <li class="breadcrumb-item"><a href="@Url.Action("ListProduct", "Home", new {productCategoryID = Model.ProductCategory.ID, name = Html.ConvertToUnSign(Model.ProductCategory.Name)})">@Model.ProductCategory.Name</a></li>
+    @if (Model.TradeMark != null)
+    {
+        <li class="breadcrumb-item"><a href="@Url.Action("ListProduct", "Home", new {tradeMarkID = Model.TradeMark.Id, name = Html.ConvertToUnSign(Model.TradeMark.Name)})">@Model.TradeMark.Name</a></li>
+    }
+</ul>
+<h1 class="box-name">
+    HỆ THỐNG SẢN PHẨM @Model.ProductCategory.Name @if (Model.TradeMark != null)
+    {<text> - </text> @Model.TradeMark.Name}
+</h1>
+@if (Model.ProductCategory.ListTagProductCategory.Any())
+{
+    <div>Thương hiệu sơn khác:</div>
+    <ul class="product-sub-menu">
+        @foreach (var tagProductCategory in Model.ProductCategory.ListTagProductCategory)
+        {
+            <li @if(Model.TradeMark?.Id == tagProductCategory.TradeMarkID){@Html.Raw("class='active'")}>
+                <a href="@Url.Action("ProductCategory", new {trademarkId = tagProductCategory.TradeMarkID})" class="text-truncate">
+                    @if (tagProductCategory.TradeMark.Avatar != null)
+                    {
+                        <img src="@Path.Combine("/images/trademarks/", tagProductCategory.TradeMark.Avatar)" class="img-fluid" alt="@tagProductCategory.TradeMark.Name" /><br />
+                    }
+                    @tagProductCategory.TradeMark.Name
+                </a>
+            </li>
+        }
+    </ul>
+}
+<hr />
+@if (Model.Products.Any())
+{
+    <div class="row no-gutter8">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-6 col-md-4 col-lg-4 col-xl-3 mb-3">
+                @Html.Partial("ProductCardPartial", product)
+            </div>
+        }
+    </div>
+    if (Model.Products.PageCount > 1)
+    {
+        <div class="text-center">
+            @Html.PagedListPager(Model.Products, page => Url.Action("ProductCategory", new { page, productCategoryId = Model.ProductCategory.ID, tradeMarkId = Model.TradeMark?.Id }))
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">Danh sách sản phẩm đang được cập nhật vui lòng quay lại sau!!</div>
+}
+@Html.Action("LasterPost", "Home")

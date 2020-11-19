@@ -1,0 +1,154 @@
+﻿@using TongkhosonVn.Models;
+@model TradeMark
+
+@{
+    ViewBag.Title = Model != null ? (Model.Id != 0 ? "Cập nhật" : "Thêm mới") : "Thêm danh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<ProductCategory> productCategories = ViewBag.ProductCategor;
+
+}
+ 
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListTradeMark","Admin")" class="btn btn-outline-info">
+        Danh sách nhãn hiệu
+    </a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdateTradeMark","Admin")" method="post" enctype="multipart/form-data">
+
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name)
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-2">Loại sản phẩm</label>
+            <div class="col-md-10">
+                <select name="ProductCategoryID" class="chosen-select" multiple>
+                    <option>Chọn nhãn hiệu</option>
+                    @foreach (ProductCategory productCategory in productCategories)
+                    {
+                        if (Model != null)
+                        {
+                            if (Model.ListTagProductCategory.SingleOrDefault(x => x.ProductCategoryID == productCategory.ID) != null)
+                            {
+                                <option value="@productCategory.ID" selected>@productCategory.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@productCategory.ID">@productCategory.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="@productCategory.ID">@productCategory.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Avatar, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div id="LoadImages">
+                    <input class="picture" type="file" name="picture" onchange="loadFile(event)" />
+                </div>
+                <div id="images-group">
+                    <div class="row">
+                        @if (Model != null)
+                        {
+                            if (Model.Id > 0)
+                            {
+                                <div class="multiple-images-wrapper col-md-2">
+                                    <img src="~/Images/TradeMarks/@Model.Avatar" class="multipleImage img-thumbnail" />
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.DisplayOrder, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DisplayOrder)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col">
+                @Html.EditorFor(model => model.Active)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.FlagHome, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col">
+                @Html.EditorFor(model => model.FlagHome)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col">
+                <button type="submit" class="btn" id="btnSubmit"></button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section scripts{
+    <script src="~/Scripts/chosen.jquery.min.js"></script>
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật nhãn hiệu");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary")
+        }
+        else {
+            $("#title").html("Thêm mới nhãn hiệu");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success")
+        }
+
+        $(".chosen-select").chosen({ width: "80%", height: "100%" });
+
+        function loadFile(event) {
+            var files = event.target.files;
+            var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+            if (files[0]["type"].length && !acceptFileTypes.test(files[0]["type"])) {
+                alert("Chỉ chấp nhận định dạng jpeg, jpg, png, gif");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            if (files[0]["size"] > 4000000) {
+                alert("Dung lượng ảnh lớn hơn 4MB");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            $("#images-group .row").html('<div class="multiple-images-wrapper col-md-2"><img src="' + URL.createObjectURL(event.target.files[0]) + '" class="img-thumbnail" /><a href="javascript:;" id="img-0" class="btn btn-outline-dark" onclick="deleteImage(0)"><span>x</span></a></div>');
+        }
+
+        function deleteImage(divid) {
+            if (confirm('Bạn có chắc xóa ảnh này?')) {
+                $('#img-' + divid).parent().fadeOut().remove();
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+            }
+        }
+    </script>
+}

@@ -1,0 +1,49 @@
+﻿@model TongkhosonVn.ViewModel.AlumbDetailViewModel
+@{
+    ViewBag.Title = Model.Album.Name;
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i></a></li>
+    <li class="breadcrumb-item"><a href="@Url.Action("AlbumImageView", "Home")">Thư viện ảnh</a></li>
+    <li class="breadcrumb-item active">@Model.Album.Name</li>
+</ul>
+<h1 class="box-name">@Model.Album.Name</h1>
+@if (Model.Album.Avatar != null)
+{
+    <div class="row">
+        @foreach (var image in Model.Album.Avatar.Split(','))
+        {
+            <div class="col-6 col-lg-4 mb-3">
+                <div class="card card-album">
+                    <a href="@Path.Combine("/images/albums/", image)" data-fancybox="gallery">
+                        <img src="@Path.Combine("/images/albums/", image)" class="card-img-top" alt="@Model.Album.Name" />
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+}
+@if (Model.Albums.Any())
+{
+    <div class="box-name">Thư viện ảnh khác</div>
+    <div class="row">
+        @foreach (var library in Model.Albums)
+        {
+            <div class="col-6 col-lg-4 mb-3">
+                <div class="card card-album">
+                    @if (library.Avatar != null)
+                    {
+                        <a href="@Url.Action("AlbumDetail", new{id = library.Id, name = Html.ConvertToUnSign(library.Name)})">
+                            <img src="@Path.Combine("/images/albums/", library.Avatar.Split(',')[0])" class="card-img-top" alt="@library.Name" />
+                        </a>
+                    }
+                    <div class="card-body">
+                        <a href="@Url.Action("AlbumDetail", new{id = library.Id, name = Html.ConvertToUnSign(library.Name)})">@library.Name</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

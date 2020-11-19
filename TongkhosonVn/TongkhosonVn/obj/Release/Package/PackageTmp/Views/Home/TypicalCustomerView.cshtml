@@ -1,0 +1,45 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<TypicalCustomer>
+@{
+    ViewBag.Title = "Danh sách khách hàng tiêu biểu";
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+<link href="~/Content/fancybox/jquery.fancybox.min.css" rel="stylesheet" />
+<div class="breadcrumb table-paint">
+    <a href="@Url.Action("Index","Home")" class="mb-2"><i class="fas fa-home"></i></a>
+    <span class="mb-2">Danh sách khách hàng tiêu biểu</span>
+</div>
+
+<div class="row">
+    @foreach (TypicalCustomer customer in Model)
+    {
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card">
+                <a href="~/Images/TypicalCustomers/@customer.Avatar" data-fancybox="images">
+                    <img src="~/Images/TypicalCustomers/@customer.Avatar" class="card-img-top" />
+                </a>
+                <div class="card-body">
+                    <div class="product-name text-center">
+                        @customer.FullName
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.fancybox.min.js"></script>
+    <script>
+        $('[data-fancybox="images"]').fancybox({
+            afterLoad: function (instance, current) {
+                var pixelRatio = window.devicePixelRatio || 1;
+
+                if (pixelRatio > 1.5) {
+                    current.width = current.width / pixelRatio;
+                    current.height = current.height / pixelRatio;
+                }
+            }
+        });
+    </script>
+}

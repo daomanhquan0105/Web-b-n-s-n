@@ -1,0 +1,153 @@
+﻿@model TongkhosonVn.Models.LibraryImage
+
+@{
+    ViewBag.Title = Model != null ? (Model.Id > 0 ? "Cập nhật thư viện ảnh" : "Thêm mới thư viện ảnh") : "Thêm mới thư viện ảnh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<link href="~/Scripts/multi-upload/jquery.fileupload.css" rel="stylesheet" />
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListAlbumImage","Admin")" class="btn btn-outline-info">
+        Album ảnh
+    </a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdateItemForAlbum","Admin")" method="post">
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Name, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Avatar, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div class="alert alert-info">
+                    <p class="btn btn-success fileinput-button">
+                        <i class="fa fa-plus"></i>
+                        <span>Chọn ảnh...</span>
+                        <input type="file" id="fileupload" name="files[]" accept="image/*" multiple="" />
+                    </p><br />
+                    - Chọn ảnh để upload: (gif, png, jpg, jpeg < 4MB)<br />
+                    - Ảnh đầu tiên sẽ là ảnh đại diện<br />
+                </div>
+                <div id="progress" class="progress">
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+                <ul id="ListImages">
+                    @if (Model?.Avatar != null)
+                    {
+                        var i = 1;
+                        var arrPic = Model.Avatar.Split(',');
+                        foreach (var item in arrPic)
+                        {
+                            <li>
+                                <input type="hidden" name="Pictures" value="@item" />
+                                <img src="@Path.Combine("/images/albums/", item)?w=80&h=80&mode=crop" alt="" width="80" height="80"/>
+                                <a href="javascript:;" id="@i" onclick="delfile('@i')"><img src="/content/admin/icon-delete.png" alt="" /></a>
+                            </li>
+                            i = i + 1;
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.DisplayOrder, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DisplayOrder)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.FlagHome, new { @class = "col-form-label col-md-2" })
+            <div class="col-lg-10">
+                @Html.EditorFor(model => model.FlagHome)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, new { @class = "col-form-label col-md-2" })
+            <div class="col-lg-10">
+                @Html.EditorFor(model => model.Active)
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" id="btnSubmit" class="btn"></button>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Scripts/multi-upload/jquery.iframe-transport.js"></script>
+    <script src="~/Scripts/multi-upload/jquery.fileupload.js"></script>
+
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật Album ảnh");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary");
+        }
+        else {
+            $("#title").html("Thêm ảnh vào Album");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success");
+        }
+        $(function () {
+            $("#ListImages").sortable();
+            $("#ListImages").disableSelection();
+        });
+        var i = 1;
+        $("#fileupload").fileupload({
+            add: function (e, data) {
+                var uploadErrors = [];
+                var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+                if (data.originalFiles[0]["type"].length && !acceptFileTypes.test(data.originalFiles[0]["type"])) {
+                    uploadErrors.push("Chỉ chấp nhận định dạng jpeg, jpg, png, gif");
+                }
+                if (data.originalFiles[0]["size"] > 4000000) {
+                    uploadErrors.push("Dung lượng ảnh lớn hơn 4MB");
+                }
+                var totalImg = $("#ListImages .thumb-img-box").length;
+                if (totalImg >= 30) {
+                    uploadErrors.push("Chỉ đăng tối đa 30 ảnh");
+                }
+                if (uploadErrors.length > 0) {
+                    alert(uploadErrors.join("\n"));
+                    return false;
+                } else {
+                    data.submit();
+                }
+                return true;
+            },
+            url: "/Uploader/Upload?folder=albums&r=" + Math.random(),
+            dataType: "json",
+            done: function (e, data) {
+                $.each(data.result.files, function (index, file) {
+                    $('#ListImages').append('<li><input type="hidden" name="Pictures" value ="' + file.name + '" /><img src="/images/albums/' + file.name + '?w=80&h=80"/><a href="javascript:;" id="' + i + '" onclick="delfile(' + i + ')"><img src="/content/admin/icon-delete.png" alt="" style="vertical-align:middle" /></a></li>');
+                });
+                i = i + 1;
+                $("#progress").fadeOut(2000);
+            },
+            start: function () {
+                $("#progress .progress-bar").css("width", "0");
+                $("#progress").show();
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $("#progress .progress-bar").css("width", progress + "%");
+            }
+        }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+        function delfile(divid) {
+            if (confirm('Bạn có chắc xóa ảnh này?')) {
+                $('#' + divid).parent().fadeOut().remove();
+            }
+        }
+    </script>
+}

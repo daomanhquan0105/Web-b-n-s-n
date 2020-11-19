@@ -1,0 +1,77 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<PostCategory>
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<div class="footer">
+    <div class="footer-start">
+        <div class="container">
+            <div class="title text-center">
+                Nhận thông tin của chúng tôi
+            </div>
+            <form id="formSendEmail">
+                <div class="input-group text-center">
+                    <input type="email" class="form-control" name="Email" placeholder="Địa chỉ email của bạn" required="" maxlength="50" />
+                    <button type="submit" class="btn btn-post-email">
+                        <i class="fal fa-envelope"></i> ĐĂNG KÝ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer-end">
+        <div class="container">
+            <div class="row">
+                <div class="col-7 col-md-4 information">
+                    @if (config.LogoBottom != null)
+                    {
+                        <a href="@Url.Action("Index", "Home")">
+                            <img src="@Path.Combine("/Images/ConfigSites/", config.LogoBottom)" class="img-fluid" alt="Logo" />
+                        </a>
+                    }
+                    <div class="support">
+                        Gọi Dịch vụ khách hàng, chúng tôi hỗ trợ 24/7:<br />
+                        <div class="phone-number"><a href="#">@config.PhoneNumber</a></div>
+                        Địa chỉ :<br />
+                        <div class="address"><a href="#">@config.Address</a></div>
+                        <div class="icon-group">
+                            <a href="@config.Facebook" rel="nofollow" target="_blank" class="mr-3 mr-lg-4"><i class="fab fa-facebook-f"></i></a>
+                            <a href="@config.Twitter" rel="nofollow" target="_blank" class="mr-3 mr-lg-4"><i class="fab fa-twitter "></i></a>
+                            <a href="@config.Youtube" rel="nofollow" target="_blank" class="mr-3 mr-lg-4"><i class="fab fa-youtube"></i></a>
+                            <a href="@config.Instagram" rel="nofollow" target="_blank"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                @foreach (var category in Model.Where(a => a.ParentCategoryId == null))
+                {
+                    <div class="col-5 col-md-2">
+                        <div class="title">
+                            @category.CategoryName
+                        </div>
+                        <ul>
+                            @foreach (var child in Model.Where(a => a.ParentCategoryId == category.Id))
+                            {
+                                <li>
+                                    <a href="@Url.Action("ListPost","Home",new {PostCategoryId= child.Id,name=Html.ConvertToUnSign(child.CategoryName) })">@child.CategoryName</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="col-md-2">
+                    <div class="title">Facebook</div>
+                    
+
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="container">
+            <div class="row contact">
+                <div class="col-12 col-md-8 text-left">
+                    @config.CopyRight
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

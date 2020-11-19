@@ -1,0 +1,67 @@
+﻿@using TongkhosonVn.Models;
+@model UserRole
+@{
+    ViewBag.Title = Model != null ? (Model.Id != 0 ? "Cập nhật" : "Thêm mới") : "Thêm danh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListAdmin","Admin")" class="btn btn-outline-info">
+        Danh sách admin
+    </a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdateUserRole","Admin")" method="post">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserName,"", new { htmlAttributes = new { @class = "form-control w300" } })
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.PassWord, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PassWord)
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2">Xác nhận mật khẩu</label>
+            <div class="col-md-10">
+                <input type="password" class="form-control w300" name="confimPass" required maxlength="60"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            @Html.EditorFor(model => model.Active)
+        </div>
+
+        <div class="form-group row pl-3">
+            <button type="submit" id="btnSubmit" class="btn"></button>
+        </div>
+    </form>
+</div>
+
+
+@section scripts{ 
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật thể loại sản phẩm");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary")
+        }
+        else {
+            $("#title").html("Thêm mới thể loại sản phẩm");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success")
+        } 
+    </script>
+}

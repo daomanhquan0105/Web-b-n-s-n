@@ -1,0 +1,139 @@
+﻿@model TongkhosonVn.Models.Banner
+
+@{
+    ViewBag.Title = Model != null ? (Model.Id > 0 ? "Cập nhật banner/slide" : "Thêm mới banner/slide") : "Thêm mới banner/slide";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<h2 id="title"></h2>
+<p>
+    <a href="@Url.Action("ListBanner","Admin")" class="btn btn-outline-info">Danh sách Banner</a>
+</p>
+<div class="box_content">
+    <form action="@Url.Action("AddOrUpdateBanner","Admin")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id)
+        }
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.BannerName, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BannerName)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Location, new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(a => a.Location, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                <div id="LoadImages">
+                    <input class="picture" type="file" name="picture" onchange="loadFile(event)" />
+                </div>
+                <div id="images-group">
+                    <div class="row">
+                        @if (Model != null)
+                        {
+                            if (Model.Id > 0)
+                            {
+                                <div class="multiple-images-wrapper col-md-2">
+                                    <img src="~/Images/Banners/@Model.Image" class="multipleImage img-thumbnail" />
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Width, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Width)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Height, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Height)
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Url, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Url)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.DisplayOrder, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DisplayOrder)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "col-form-label col-md-2" })
+            <div class="col">
+                @Html.EditorFor(model => model.Active)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col">
+                <button type="submit" id="btnSubmit" class="btn"></button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+@section scripts{
+    <script>
+        if ($("#Id").val() > 0) {
+            $("#title").html("Cập nhật banner/slider");
+            $("#btnSubmit").html('<i class="far fa-pen-square mr-1"></i>Lưu thay đổi');
+            $("#btnSubmit").addClass("btn-primary")
+        }
+        else {
+            $("#title").html("Thêm mới banner/slider");
+            $("#btnSubmit").html('<i class="far fa-plus mr-1"></i> Thêm mới');
+            $("#btnSubmit").addClass("btn-success")
+        }
+
+        function loadFile(event) {
+            var files = event.target.files;
+            var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+            if (files[0]["type"].length && !acceptFileTypes.test(files[0]["type"])) {
+                alert("Chỉ chấp nhận định dạng jpeg, jpg, png, gif");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            if (files[0]["size"] > 4000000) {
+                alert("Dung lượng ảnh lớn hơn 4MB");
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+                return false;
+            }
+            $("#images-group .row").html('<div class="multiple-images-wrapper col-md-2"><img src="' + URL.createObjectURL(event.target.files[0]) + '" class="img-thumbnail" /><a href="javascript:;" id="img-0" class="btn btn-outline-dark" onclick="deleteImage(0)"><span>x</span></a></div>');
+        }
+        function deleteImage(divid) {
+            if (confirm('Bạn có chắc xóa ảnh này?')) {
+                $('#img-' + divid).parent().fadeOut().remove();
+                $("#LoadImages .picture").remove();
+                $("#LoadImages").append('<input type="file" class="picture" name="picture" onchange="loadFile(event)" />')
+            }
+        }
+    </script>
+}

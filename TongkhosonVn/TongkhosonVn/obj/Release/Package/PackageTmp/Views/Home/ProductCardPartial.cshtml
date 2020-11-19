@@ -1,0 +1,21 @@
+﻿@using TongkhosonVn.Models;
+@model Product
+<div class="card">
+    @if (Model.Images != null)
+    {
+        <a href="@Url.Action("ProductDetail", "Home", new {id = Model.Id, name = Html.ConvertToUnSign(Model.Name)})" class="image">
+            <img src="~/Images/Products/@Model.Images.Split(';')[0]" class="img-fluid" alt="@Model.Name"/>
+        </a>
+    }
+    <div class="card-body text-center">
+        <div class="product-name">
+            <a href="@Url.Action("ProductDetail", "Home", new {id = Model.Id, name = Html.ConvertToUnSign(Model.Name)})">
+                @Model.Name
+            </a>
+        </div>
+        <div class="product-price">
+            @Model.Price.ToString("#,##") VND
+        </div>
+    </div>
+</div>
+

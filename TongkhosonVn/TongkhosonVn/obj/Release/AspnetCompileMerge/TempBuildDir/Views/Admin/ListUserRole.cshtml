@@ -1,0 +1,65 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<UserRole>
+@{
+    ViewBag.Title = "Danh sách Admin";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+ 
+<h2>Danh sách Admin</h2>
+
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateUserRole","Admin")" type="button" class="btn btn-success btn-lg ">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+
+
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm" id="TableList">
+    <thead>
+        <tr>
+            <th>Account</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var admin in Model)
+        {
+            <tr id="row-@admin.Id">
+
+                <td>@admin.UserName</td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateAdmin","Admin",new {@id=admin.Id })" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="DeleteAdmin(@admin.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    table#TableList {
+        border-collapse: collapse !important;
+    }
+</style>
+@section scripts{
+    <script>
+        function DeleteAdmin(adminID) {
+            if (confirm("Bạn có chắc muốn xóa tài khoản đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteAdmin",
+                    data: { id: adminID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + adminID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+}

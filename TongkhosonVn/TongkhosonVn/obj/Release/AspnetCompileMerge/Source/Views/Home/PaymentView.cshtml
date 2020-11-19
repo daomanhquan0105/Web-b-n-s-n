@@ -1,0 +1,13 @@
+﻿@using TongkhosonVn.Models;
+@{
+    ViewBag.Title = "Hướng dẫn thanh toán - mua hàng";
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+
+<div class="breadcrumb mb-5">
+    <a href="@Url.Action("Index","Home")" class="mb-2"><i class="fas fa-home"></i></a> 
+    <span class="mb-2">Chính sách thanh toán</span>
+</div>
+@Html.Raw(config.Payment)
+

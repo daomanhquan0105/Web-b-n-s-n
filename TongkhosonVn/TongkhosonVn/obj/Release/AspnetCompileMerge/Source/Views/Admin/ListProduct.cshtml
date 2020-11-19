@@ -1,0 +1,108 @@
+﻿@using TongkhosonVn.Models;
+
+@using PagedList.Mvc;
+@model PagedList.IPagedList<Product>
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách sản phẩm</h2>
+<div class="box_content">
+    <p>
+        <a href="@Url.Action("AddOrUpdateProduct","Admin")" type="button" class="btn btn-info">
+            <i class="far fa-plus mr-1"></i> Thêm mới
+        </a>
+    </p>
+    <table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm" >
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá sale</th>
+                <th>Giá gốc</th>
+                <th>Loại sản phẩm</th>
+                <th>Nhãn hiệu</th>
+                <th>Thời gian bảo hành</th>
+                <th>Số lượng</th>
+                <th>Hiển thị</th>
+                <th>Hiển trang chủ</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="table-light">
+            @foreach (Product product in Model)
+            {
+                <tr data-id="@product.Id" id="row-@product.Id">
+                    <td>@product.DisplayOrder</td>
+                    <td>
+                        <a href="@Url.Action("AddOrUpdateLeader", "Admin", new {@id = product.Id})">
+                            @{ string[] str = product.Images.Split(';'); }
+                            <img src="~/Images/Products/@str[0]" width="100" />
+                        </a>
+                    </td>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>@product.OriginalPrice </td>
+                    <td>@product.ProductCategory.Name</td>
+                    <td>@product.TradeMark.Name</td>
+                    <td>@product.Warranty</td>
+                    <td>@product.Quantity</td>
+                    <td>
+                    <input type="checkbox" name="FlagHome" checked="@product.FlagHome" onclick="CheckFlagHome(@product.Id)"/>
+                </td>
+                <td>
+                    <input type="checkbox" name="FlagHome" checked="@product.Active" onclick="CheckActive(@product.Id)" />
+                </td>
+                    <td>
+                        <a href="@Url.Action("AddOrUpdateProduct", "Admin", new { id = product.Id})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                        <button class="btn btn-warning" onclick="DeleteProduct(@product.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.PageCount > 1)
+    {
+        <div class="text-right">@Html.PagedListPager(Model, page => Url.Action("ListProduct", new { page }))</div>
+    }
+</div>
+@section scripts{
+    <script>
+        function DeleteProduct(productId) {
+            if (confirm("Bạn có chắc muốn xóa thủ lĩnh đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteProduct",
+                    data: { id: productId },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + productId).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+        function CheckFlagHome(tradeMarkID) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckFlagHomeTradeMark",
+                data: { id: tradeMarkID }
+            })
+        }
+        function CheckActive(tradeMarkID) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckActiveTradeMark",
+                data: { id: tradeMarkID }
+            })
+        }
+    </script>
+}
+
+

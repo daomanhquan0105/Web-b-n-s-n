@@ -1,0 +1,51 @@
+﻿@model TongkhosonVn.ViewModel.PostDetailViewModel
+@{
+    ViewBag.Title = Model.Post.MetaTitle ?? Model.Post.Subject;
+    ViewBag.Description = Model.Post.MetaDescription ?? Model.Post.Description;
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="mb-2"><i class="fas fa-home"></i></a></li>
+    @if (Model.Post.PostCategory.ParentCategory != null)
+    {
+        <li class="breadcrumb-item"><a href="@Url.Action("ListPost", new{url = Model.Post.PostCategory.ParentCategory.Url})"> @Model.Post.PostCategory.ParentCategory.CategoryName </a></li>
+    }
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("ListPost", "Home", new {url = Model.Post.PostCategory.Url})"> @Model.Post.PostCategory.CategoryName</a>
+    </li>
+    <li class="breadcrumb-item active text-truncate">@Model.Post.Subject</li>
+</ul>
+<div class="bg-white shadow p-3">
+    <h1 class="box-name">@Model.Post.Subject</h1>
+    <p class="post-date"><i class="fal fa-calendar-alt"></i> @Model.Post.CreateDate.ToString("dd/MM/yyyy")</p>
+    <div class="post-sapo">
+        @Model.Post.Description
+    </div>
+    <div class="body-content">
+        @Html.Raw(Model.Post.Content)
+    </div>
+</div>
+@if (Model.Posts.Any())
+{
+    <div class="box-name mt-lg-4 mt-3">Bài viết khác</div>
+    <div class="row mb-3">
+        @foreach (var post in Model.Posts)
+        {
+            <div class="col-lg-4">
+                <div class="card card-post">
+                    @if (post.Image != null)
+                    {
+                        <img src="@Path.Combine("/images/posts/", post.Image)" class="img-fluid" alt="@post.Subject" />
+                    }
+                    <div class="card-body">
+                        <h3><a href="@Url.Action("PostDetail", new{id = post.Id, name = post.Url})" class="stretched-link">@post.Subject</a></h3>
+                        <div class="sapo-grid truncate-h" data-line="3">
+                            @post.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

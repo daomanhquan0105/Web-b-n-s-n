@@ -1,0 +1,80 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<PostCategory>
+@{
+    ViewBag.Title = "Danh sách thể loại bài đăng/tin tức";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách danh mục bài đăng</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpDatePostCategory","Admin")" type="button" class="btn btn-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered  mt-4 mb-4 p-3 bg-white border shadow-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên thể loại</th> 
+            <th>Danh mục cha</th>
+            <th>Loại danh mục</th>
+            <th>Hoạt động</th>
+            <th>Hiện trang chủ</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var postCategory in Model.Where(a=>a.ParentCategoryId == null))
+        {
+            <tr id="row-@postCategory.Id" class="bg-light">
+                <td>@postCategory.DisplayOrder</td>
+                <td>@postCategory.CategoryName</td>
+                <td>-</td>
+                <td>@postCategory.TypeCategory</td>
+                <td>@Html.DisplayFor(a=>postCategory.ShowMenu)</td>
+                <td>@Html.DisplayFor(a=>postCategory.Active)</td>
+                <td>
+                    <a href="@Url.Action("AddOrUpDatePostCategory", "Admin", new {id = postCategory.Id})" class="btn btn-sm btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-sm btn-warning" onclick="DeletepostCategory(@postCategory.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            foreach (var child in Model.Where(a=>a.ParentCategoryId == postCategory.Id))
+            {
+                <tr id="row-@child.Id">
+                    <td>@child.DisplayOrder</td>
+                    <td> ---- @child.CategoryName</td>
+                    <td>@child.ParentCategory.CategoryName</td>
+                    <td>@child.TypeCategory</td>
+                    <td>@Html.DisplayFor(a=> child.ShowMenu)</td>
+                    <td>@Html.DisplayFor(a=> child.Active)</td>
+                    <td>
+                        <a href="@Url.Action("AddOrUpDatePostCategory", "Admin", new {id = child.Id})" class="btn btn-sm btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                        <button class="btn btn-sm btn-warning" onclick="DeletepostCategory(@child.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function DeletepostCategory(postCategoryId) {
+        if (confirm("Bạn có chắc muốn xóa thể loại bài viết đã chọn không?")) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/DeletePostCategory",
+                data: { catId: postCategoryId },
+                success: function (res) {
+                    if (res) {
+                        alert("Xóa thành công!");
+                        $("#row-" + postCategoryId).fadeOut();
+                    }
+                    else {
+                        alert("Bị lỗi!");
+                    }
+                }
+            })
+        }
+    }
+    </script>
+}

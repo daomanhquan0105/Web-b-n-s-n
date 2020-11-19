@@ -1,0 +1,99 @@
+﻿@using TongkhosonVn.Models; 
+@model IEnumerable<ProductCategory>
+@{
+    ViewBag.Title = "Danh sách thể loại sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách thể loại sản phẩm</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateProductCategory","Admin")" type="button" class="btn btn-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên thể loại</th>
+            <th>Nhãn hiệu</th> 
+            <th>Hiện trang chủ</th>
+            <th>Hiện menu ngang</th>
+            <th>Hoạt động</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (ProductCategory productCategory in Model)
+        {
+            <tr id="row-@productCategory.ID">
+                <td>@productCategory.DisplayOrder</td>
+                <td>@productCategory.Name</td>
+                <td>
+                    @foreach(TagProductCategory tag in productCategory.ListTagProductCategory)
+                    {
+                        <p>@tag.TradeMark.Name</p>
+                    }
+                </td>
+                <td>
+                    <input type="checkbox" onclick="CheckFlagHome(@productCategory.ID)" checked="@productCategory.FlagHome" />
+                </td>
+                <td> 
+                    <input type="checkbox" onclick="CheckMenuVerticalHome(@productCategory.ID)" checked="@productCategory.ShowMenuVertical" />
+                </td>
+                <td>
+                    <input type="checkbox" onclick="CheckActive(@productCategory.ID)" checked="@productCategory.Active" />
+                </td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateProductCategory", "Admin", new {@id = productCategory.ID})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="DeleteproductCategory(@productCategory.ID)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function DeleteproductCategory(productCategoryID) {
+            if (confirm("Bạn có chắc muốn xóa thể loại sản phẩm đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteProductCategory",
+                    data: { id: productCategoryID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + productCategoryID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+        function CheckFlagHome(productCategoryID) {
+            $.ajax({
+                type: "post",
+                url: "/Admin/CheckFlagHomeProductCategory",
+                data: { id: productCategoryID }
+            })
+        }
+        function CheckMenuVerticalHome(productCategoryID) {
+            $.ajax({
+                type: "post",
+                url: "/Admin/CheckFlagHomeProductCategory",
+                data: { id: productCategoryID }
+            })
+        }
+        function CheckActive(productCategoryID) {
+            $.ajax({
+                type: "post",
+                url: "/Admin/CheckActiveProductCategory",
+                data: { id: productCategoryID }
+            })
+        }
+    </script>
+}
+
+

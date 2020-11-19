@@ -1,0 +1,108 @@
+﻿@using TongkhosonVn.Models;
+@model TongkhosonVn.ViewModel.HeaderViewModel
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+
+<header>
+    <div class="container">
+        <div class="text-center text-sm-left">
+            <a href="tel:@config.PhoneNumber" rel="nofollow" class="mr-20"><i class="fal fa-mobile-alt mr-1"></i> @config.PhoneNumber</a>
+            <a href="mailto:@config.Email" class="mr-20" rel="nofollow"><i class="far fa-envelope mr-1"></i>@config.Email</a>
+            <a href="#" class="mr-20" rel="nofollow"><i class="fas fa-map-marker-alt mr-1"></i>@config.Address</a>
+            <div class="float-right d-none d-sm-block">
+                <a href="@config.Facebook" target="_blank" rel="nofollow"><i class="fab fa-facebook-f mr-3"></i></a>
+                <a href="@config.Youtube" target="_blank" rel="nofollow"><i class="fab fa-youtube mr-3"></i></a>
+                <a href="@config.Instagram" target="_blank" rel="nofollow"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="header-top">
+        <div class="row top justify-content-center align-items-center">
+            <div class="col-5 col-sm-3 col-lg-3">
+                @if (config.LogoTop != null)
+                {
+                    <a href="/">
+                        <img src="@Path.Combine("/Images/ConfigSites/",config.LogoTop)" class="img-fluid" alt="Tổng kho sơn Việt Nam" />
+                    </a>
+                }
+            </div>
+            <div class="col-sm-8 col-lg-7 d-none d-sm-block">
+                <form action="@Url.Action("ProductSearch","Home")" method="get" class="search-form-top">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <select class="custom-select" name="ProductCategoryId">
+                                <option value="">Tất cả danh mục</option>
+                                @foreach (var productCategory in Model.ProductCategories)
+                                {
+                                    <option value="@productCategory.ID">@productCategory.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <input type="text" name="ProductName" class="form-control" placeholder="Tìm theo tên sản phẩm">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-2 d-none d-lg-block">
+                <a href="tel:@config.PhoneNumber" class="btn btn-danger btn-phone-number btn-block">
+                    Nhận tư vấn ngay: <br /><span>@config.PhoneNumber</span>
+                </a>
+            </div>
+            <div class="col-5 col-sm-1 d-block d-lg-none align-self-center text-right">
+                <a href="javascript:;" class="menu-mobile" onclick="Toggle_MenuMobile()"><i class="far fa-bars"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="banner-menu">
+    <div class="container">
+        <div class="row no-gutter13">
+            <div class="col-xl-3 d-none d-xl-block">
+                <div class="box-category-top">
+                    <i class="far fa-bars mr-3"></i>Tất cả danh mục
+                </div>
+            </div>
+            <div class="col-12 col-xl-9">
+                <ul class="list-group-horizontal text-center text-lg-right">
+                    <li>
+                        <a href="@Url.Action("Index","Home")">Trang chủ</a>
+                    </li>
+                    @foreach (var productCategory in Model.ProductCategories.Where(x => x.ShowMenuVertical))
+                    {
+                        <li class="d-none d-md-inline">
+                            <a href="@Url.Action("ProductCategory","Home",new { productCategoryID=productCategory.ID,name=Html.ConvertToUnSign(productCategory.Name) })">
+                                @productCategory.Name
+                            </a>
+                        </li>
+                    }
+                    @foreach (var category in Model.PostCategories.Where(a => a.ParentCategoryId == null && a.ShowMenu))
+                    {
+                        <li>
+                            <a href="@Url.Action("ListPost","Home", new{url = category.Url})">@category.CategoryName</a>
+                            @if (Model.PostCategories.Any(a => a.ParentCategoryId == category.Id))
+                            {
+                                <ul>
+                                    @foreach (var child in Model.PostCategories.Where(a=>a.ParentCategoryId == category.Id))
+                                    {
+                                        <li><a href="@Url.Action("ListPost","Home", new{url = child.Url})"><i class="fal fa-angle-right"></i> @child.CategoryName</a></li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                    <li>
+                        <a href="@Url.Action("ContactView","Home")">Liên hệ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.Action("MenuMobilePartial", "Home")

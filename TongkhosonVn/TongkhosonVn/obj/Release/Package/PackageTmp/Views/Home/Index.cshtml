@@ -1,0 +1,130 @@
+﻿@using TongkhosonVn.Models
+@using TongkhosonVn.ViewModel;
+@model HomeViewModel
+@{
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+
+    ViewBag.Title = config.Title;
+    ViewBag.Description = config.Description;
+}
+
+<div class="body">
+    <div class="container">
+        <div class="row no-gutter13 mb-4">
+            <div class="col-lg-3 d-none d-lg-block">
+                <ul class="menu-left menu-home">
+                    <li class="list-title d-block d-xl-none">
+                        <i class="fal fa-bars mr-3"></i>Tất cả danh mục
+                    </li>
+                    @foreach (var tradeMark in Model.TradeMarks)
+                    {
+                        <li>
+                            <a href="@Url.Action("ListProduct","Home",new { name=Html.ConvertToUnSign(tradeMark.Name), tradeMarkId = tradeMark.Id })">
+                                <i class="fal fa-angle-right"></i> @tradeMark.Name
+                            </a>
+                            <ul>
+                                @foreach (var tag in tradeMark.ListTagProductCategory)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("ListProduct","Home",new { productCategoryID =tag.ProductCategory.ID, name=Html.ConvertToUnSign(tradeMark.Name), tradeMarkId = tradeMark.Id })">
+                                            @tag.ProductCategory.Name
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-12 col-lg-9 pt-4">
+                <div class="banner-slides">
+                    @foreach (var banner in Model.Banners)
+                    {
+                        <div class="slide-slide">
+                            <a href="@banner.Url"><img src="@Path.Combine("/images/banners/", banner.Image)" class="img-fluid" alt="@banner.BannerName" /></a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row partner no-gutter13">
+            @foreach (var tradeMark in Model.TradeMarks.Take(6))
+            {
+                <div class="col-4 col-md-3 col-lg-2 mb-3">
+                    <div class="card">
+                        <a href="@Url.Action("ListProduct", new {tradeMarkID = tradeMark.Id, name = Html.ConvertToUnSign(tradeMark.Name)})">
+                            @if (tradeMark.Avatar != null)
+                            {
+                                <img src="@Path.Combine("/Images/TradeMarks/",tradeMark.Avatar)" class="img-fluid" alt="@tradeMark.Name" />
+                            }
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+        @foreach (var tradeMark1 in Model.TradeMarks)
+        {
+            @Html.Partial("ActiveProductForCategoryPartial", tradeMark1)
+        }
+        <div class="library-img text-center mt-lg-5 mt-4">
+            <div class="title">Thư viện nhà đẹp</div>
+            <div class="icon">
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            @if (Model.LibraryImage != null)
+            {
+                <div class="row no-gutter2">
+                    @foreach (var image in Model.LibraryImage.Avatar.Split(',').Take(8))
+                    {
+                        <div class="col-6 col-md-4 col-lg-3 mb-1">
+                            <div class="card">
+                                <a href="@Path.Combine("/Images/Albums/", image)" class="image" data-fancybox="gallery">
+                                    <img src="@Path.Combine("/Images/Albums/", image)" class="card-img-top" alt="@Model.LibraryImage.Name"/>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <a href="@Url.Action("AlbumImageView","Home")" class="btn read-all mt-3">
+                Xem tất cả
+            </a>
+        </div>
+    </div>
+</div>
+<div class="feed-back">
+    <div class="title">Khách hàng nói về chúng tôi</div>
+    <div class="icon"><i class="fas fa-ellipsis-h"></i></div>
+    <div class="container">
+        <div class="testi-slides">
+            @foreach (var feedBack in Model.FeedBacks)
+            {
+                <div class="testi-item">
+                    <div class="avatar">
+                        @if (feedBack.Avatar != null)
+                        {
+                            <img src="@Path.Combine("/images/feedbacks/", feedBack.Avatar)" class="img-fluid" alt="@feedBack.FullNname" />
+                        }
+                    </div>
+                    <div class="mt-lg-4 mt-3">
+                        @Html.Raw(feedBack.Description)
+                    </div>
+                    <div class="testi-name">
+                        <strong>@feedBack.FullNname</strong>
+                        <div>@feedBack.NoteContent</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script>
+        $(".banner-slides, .testi-slides").slick({
+            autoplay: true,
+            prevArrow: "<div class='arrow-prev'><i class='fal fa-chevron-left'></i></div>",
+            nextArrow: "<div class='arrow-next'><i class='fal fa-chevron-right'></i></div>"
+        })
+    </script>
+}

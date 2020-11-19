@@ -1,0 +1,118 @@
+﻿@using TongkhosonVn.Models
+@model Product
+@{
+    var quantity = Model.Quantity != 0 ? "Còn hàng" : "Hết hàng";
+    var config = (ConfigSite)HttpContext.Current.Application["ConfigSite"];
+}
+<ul class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i></a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("ListProduct", "Home", new {name = ""})">Sản phẩm</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("ListProduct", "Home", new {tradeMarkId = Model.TradeMarkID, name = Html.ConvertToUnSign(Model.TradeMark.Name), productCategoryId = Model.ProductCategoryID})">@Model.TradeMark.Name</a>
+    </li>
+    @if (Model.ProductCategory != null)
+    {
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("ListProduct", "Home", new {productCategoryId = Model.ProductCategoryID, tradeMarkId = Model.TradeMarkID, name = Html.ConvertToUnSign(Model.ProductCategory.Name)})">@Model.ProductCategory.Name</a>
+        </li>
+    }
+    <li class="breadcrumb-item active text-truncate">@Model.Name</li>
+</ul>
+<div class="detail">
+    <div class="row">
+        <div class="col-12 col-sm-8 col-lg-6">
+            <div class="main-slider">
+                @for (var i = 0; i < Model.Images.Split(';').Length - 1; i++)
+                {
+                    <img src="@Path.Combine("/Images/Products/",Model.Images.Split(';')[i])" class="img-fluid" alt="@Model.Name" />
+                }
+            </div>
+            <div class="thumb-slider">
+                @for (var i = 0; i < Model.Images.Split(';').Length - 1; i++)
+                {
+                    <div class="item">
+                        <img src="@Path.Combine("/Images/Products/",Model.Images.Split(';')[i])" class="img-fluid" alt="@Model.Name" />
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 information">
+            <h1 class="name">@Model.Name</h1>
+            <ul class="description">
+                <li>
+                    <span>Mã sản phẩm :</span> <span>@Model.Code</span>
+                </li>
+                <li>
+                    <span>Thương hiệu:</span> <span>@Model.TradeMark.Name</span>
+                </li>
+                <li>
+                    <span>Loại sơn:</span> <span>@(Model.ProductCategory?.Name)</span>
+                </li>
+                <li>
+                    <span>Tình trạng: </span> <span>@quantity</span>
+                </li>
+                <li>
+                    <span>Mô tả :</span> <span>@Model.Description</span>
+                </li>
+            </ul>
+            <div class="product-price">
+                @Model.Price.ToString("#,##") VNĐ
+                @if (Model.OriginalPrice != 0)
+                {
+                    <u class="ml-3">@Model.OriginalPrice.ToString("#,##") VNĐ</u>
+                }
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <a href="tel:@config.PhoneNumber" rel="nofollow" class="btn btn-block btn-lg btn-buy-product">
+                        LIÊN HỆ MUA HÀNG
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="https://zalo.me/@config.PhoneNumber" rel="nofollow" target="_blank" class="btn btn-block btn-lg btn-zalo">
+                        CHAT ZALO
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav nav-tabs" id="product-tab" role="tablist">
+        <a class="nav-link active" id="1" data-toggle="tab" href="#Detail" role="tab" aria-controls="Detail" aria-selected="true">
+            THÔNG TIN CHI TIẾT
+        </a>
+        <a class="nav-link" id="2" data-toggle="tab" href="#Paint-price" role="tab" aria-controls="Paint-price" aria-selected="false">
+            BÁO GIÁ SƠN
+        </a>
+        <a class="nav-link" id="3" data-toggle="tab" href="#Payment" role="tab" aria-controls="Payment" aria-selected="false">
+            THANH TOÁN
+        </a>
+        <a class="nav-link" id="4" data-toggle="tab" href="#Ship" role="tab" aria-controls="Ship" aria-selected="false">
+            VẬN CHUYỂN SƠN
+        </a>
+        <a class="nav-link" id="5" data-toggle="tab" href="#Warranty" role="tab" aria-controls="Warranty" aria-selected="false">
+            BẢO HÀNH SƠN
+        </a>
+
+    </div>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="Detail" role="tabpanel" aria-labelledby="nav-home-tab">
+            @Html.Raw(Model.Detail)
+        </div>
+        <div class="tab-pane fade" id="Paint-price" role="tabpanel" aria-labelledby="nav-profile-tab">
+            @Html.Raw(config.PricePaint)
+        </div>
+        <div class="tab-pane fade" id="Payment" role="tabpanel" aria-labelledby="nav-contact-tab">
+            @Html.Raw(config.Payment)
+        </div>
+        <div class="tab-pane fade" id="Ship" role="tabpanel" aria-labelledby="nav-profile-tab">
+            @Html.Raw(config.Transport)
+        </div>
+        <div class="tab-pane fade" id="Warranty" role="tabpanel" aria-labelledby="nav-contact-tab">
+            <p><strong>Thời gian bảo hành:</strong> @Model.Warranty tháng</p>
+        </div>
+    </div>
+</div>

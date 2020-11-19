@@ -1,0 +1,67 @@
+﻿@using PagedList.Mvc;
+@model TongkhosonVn.ViewModel.ListPostViewModel
+@{
+    ViewBag.Title = Model.PostCategory.MetaTitle ?? Model.PostCategory.CategoryName;
+    ViewBag.Description = Model.PostCategory.MetaDescription ?? Model.PostCategory.CategoryName;
+
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")" class="mb-2"><i class="fas fa-home"></i></a></li>
+    @if (Model.PostCategory.ParentCategory != null)
+    {
+        <li class="breadcrumb-item"><a href="@Url.Action("ListPost", new{url = Model.PostCategory.ParentCategory.Url})"> @Model.PostCategory.ParentCategory.CategoryName </a></li>
+    }
+    <li class="breadcrumb-item active">@Model.PostCategory.CategoryName</li>
+</ul>
+@if (Model.ChildCategories.Any())
+{
+    <ul class="product-sub-menu">
+        @foreach (var childCategory in Model.ChildCategories)
+        {
+            <li @if(Model.PostCategory.Id == childCategory.Id){@Html.Raw("class='active'")}><a href="@Url.Action("ListPost", new{url = childCategory.Url})">@childCategory.CategoryName</a></li>
+        }
+    </ul>
+}
+@if (Model.Posts.Any())
+{
+    <div class="row List-post">
+        @foreach (var post in Model.Posts)
+        {
+            <div class="col-6 col-sm-3 col-md-4 mb-4 text-left">
+                <div class="card">
+                    @if (post.Image != null)
+                    {
+                        <a href="@Url.Action("PostDetail", "Home", new {id = post.Id, name = Html.ConvertToUnSign(post.Subject)})" class="image">
+                            <img src="~/Images/Posts/@post.Image" class="card-img-top" alt="@post.Subject" />
+                        </a>
+                    }
+                    <div class="card-body">
+                        <div class="subject mb-2">
+                            <a href="@Url.Action("PostDetail", "Home", new {id = post.Id, name = Html.ConvertToUnSign(post.Subject)})">
+                                @post.Subject
+                            </a>
+                        </div>
+                        <div class="create-date mb-3">
+                            <i class="far fa-calendar-alt mr-2"></i> @post.CreateDate.ToString("MMMM/dd/yyyy").Replace('/', ' ')
+                        </div>
+                        <div class="content truncate-h" data-line="3">
+                            @post.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    if (Model.Posts.PageCount > 1)
+    {
+        <div class="text-center">
+            @Html.PagedListPager(Model.Posts, page => Url.Action("ListPost", new { page, url = Model.PostCategory.Url }))
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">Nội dung đang được cập nhật, quý khách vui lòng quay lại sau.</div>
+}

@@ -1,0 +1,95 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<TradeMark>
+@{
+    ViewBag.Title = "Danh sách thể loại nhãn hiệu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách thể loại nhãn hiệu</h2>
+<div class="mb-3">
+    <a href="@Url.Action("AddOrUpdateTradeMark","Admin")" type="button" class="btn btn-info">
+        <i class="far fa-plus mr-1"></i> Thêm mới
+    </a>
+</div>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm lh-sm">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên nhãn hiệu</th>
+            <th>Logo</th>
+            <th>Tên loại cung cấp</th>
+            <th>Hoạt động</th>
+            <th>Hiện trang chủ</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (TradeMark tradeMark in Model)
+        {
+            <tr id="row-@tradeMark.Id">
+                <td>@tradeMark.DisplayOrder</td>
+                <td>@tradeMark.Name</td>
+                <td>
+                    @if (tradeMark.Avatar != null)
+                    {
+                        <img src="~/Images/TradeMarks/@tradeMark.Avatar" style="width:100px" />
+                    }
+                </td>
+                <td>
+                    @foreach (TagProductCategory tag in tradeMark.ListTagProductCategory)
+                    {
+                        <p>@tag.ProductCategory.Name</p>
+                    }
+                </td>
+                <td>
+                    <input type="checkbox" name="FlagHome" checked="@tradeMark.FlagHome" onclick="CheckFlagHome(@tradeMark.Id)"/>
+                </td>
+                <td>
+                    <input type="checkbox" name="FlagHome" checked="@tradeMark.Active" onclick="CheckActive(@tradeMark.Id)" />
+                </td>
+                <td>
+                    <a href="@Url.Action("AddOrUpdateTradeMark", "Admin", new {@id = tradeMark.Id})" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                    <button class="btn btn-warning" onclick="DeleteTradeMark(@tradeMark.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function DeleteTradeMark(TradeMarkID) {
+            if (confirm("Bạn có chắc muốn xóa thể loại sản phẩm đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteProductCategory",
+                    data: { id: TradeMarkID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + TradeMarkID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+        function CheckFlagHome(tradeMarkID) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckFlagHomeProduct",
+                data: { id: tradeMarkID }
+            })
+        }
+        function CheckActive(tradeMarkID) {
+            $.ajax({
+                type: "Post",
+                url: "/Admin/CheckActiveProduct",
+                data: { id: tradeMarkID }
+            })
+        }
+    </script>
+}
+
+

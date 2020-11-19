@@ -1,0 +1,40 @@
+﻿@model TongkhosonVn.Models.Order
+
+@{
+    ViewBag.Title = "Thông tin đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Thông tin đơn hàng</h2>
+ <p>
+     <a href="@Url.Action("ListOrder","Admin")" class="btn btn-outline-info">
+         Danh sách hóa đơn
+     </a>
+ </p>
+
+<div class="form-group row">
+    <label class="col-form-label col-2">Thông tin người mua</label>
+    <div class="col-md-10"> 
+        <p><strong class="mr-2">Người mua:</strong> @Model.Member.FullName</p>
+        <p><strong class="mr-2">Địa chỉ:</strong> @Model.Member.Address</p>
+        <p><strong class="mr-2">Điện thoại:</strong> @Model.Member.Phone</p>
+        <p><strong class="mr-2">Email:</strong> @Model.Member.Email</p>
+        <p><strong class="mr-2">Ngày đặt:</strong> @Model.CreateDate.ToString("dd/MM/yyyy")</p>
+
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-form-label col-2">Thông tin sản phẩm</label>
+    <div class="col-md-10">
+        <p><strong class="mr-2">Tên sản phẩm:</strong>   @Model.Product.Name</p>
+        <p><strong class="mr-2">Giá tiền:</strong>  @Model.Product.Price.ToString("#,##")</p>
+        <p><img src="~/Images/Products/@Model.Product.Images.Split(';')[0]" class="img-thumbnail w-auto" /></p>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-form-label col-2">Tình trạng</label>
+    @Html.EditorFor(model => model.Status)
+</div>
+  

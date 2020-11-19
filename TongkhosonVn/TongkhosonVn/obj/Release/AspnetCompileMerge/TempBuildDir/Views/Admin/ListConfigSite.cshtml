@@ -1,0 +1,71 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<ConfigSite>
+@{
+    ViewBag.Title = "Danh sách cấu hình web";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Danh sách cấu hình web</h2>
+<div class="box_content">
+    @*<p>
+        <a href="@Url.Action("AddOrUpdateConfig","Admin")" type="button" class="btn btn-info">
+            <i class="far fa-plus mr-1"></i> Thêm mới
+        </a>
+    </p>*@
+    <table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm">
+        <thead>
+            <tr> 
+                <th>Email</th>
+                <th>Địa chỉ</th>
+                <th>Số điện thoại</th>
+                <th>Logo trên</th>
+                <th>Logo dưới</th>
+                <th>Hoạt động</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="table-light">
+            @foreach (ConfigSite configSite in Model)
+            {
+                <tr id="row-@configSite.Id">
+                    <td>@configSite.Email</td>
+                    <td>@configSite.Address</td>
+                    <td>@configSite.PhoneNumber</td>
+                    <td>
+                        <img src="~/Images/ConfigSites/@configSite.LogoTop" width="100"/>
+                    </td>
+                    <td class="bg-dark">
+                        <img src="~/Images/ConfigSites/@configSite.LogoBottom" width="100"/>
+                    </td>
+                    <td>@configSite.Active</td>
+                    <td>
+                        <a href="@Url.Action("AddOrUpdateConfig","Admin",new {@id=configSite.Id })" class="btn btn-success" title="Sửa"><i class="fal fa-edit"></i></a>
+                        @*<button class="btn btn-warning" onclick="DeleteConfig(@configSite.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section scripts{
+    <script>
+        function DeleteConfig(configID) {
+            if (confirm("Bạn có chắc muốn xóa config đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteCofig",
+                    data: { id: configID },
+                    success: function (res) {
+                        if (res) {
+                            alert("Xóa thành công!");
+                            $("#row-" + configID).fadeOut();
+                        }
+                        else {
+                            alert("Bị lỗi!");
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+}

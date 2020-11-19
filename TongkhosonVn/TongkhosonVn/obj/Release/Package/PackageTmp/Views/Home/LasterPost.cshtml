@@ -1,0 +1,33 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<Post>
+
+<div class="category-panit d-block d-lg-none">
+    <div class="title">
+        BÀI ĐĂNG GẦN ĐÂY
+    </div>
+    <hr />
+    <div class="row">
+        @foreach (Post post in Model)
+        {
+            <div class="col-6 col-md-4 col-lg mb-3">
+                <div class="card">
+                    <a href="@Url.Action("PostDetail","Home",new { id=post.Id,name=Html.ConvertToUnSign(post.Subject) })">
+                        <img src="~/Images/Posts/@post.Image" class="card-img-top" />
+                    </a>
+                    <div class="card-body">
+                        <div class="product-name">
+                            <a href="@Url.Action("PostDetail","Home",new { id=post.Id,name=Html.ConvertToUnSign(post.Subject) })">
+                                @post.Content
+                            </a>
+                        </div>
+                        <div class="create-date">
+                            <i class="far fa-calendar-alt mr-2"></i>  @post.CreateDate.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        } 
+    </div>
+
+</div>
+

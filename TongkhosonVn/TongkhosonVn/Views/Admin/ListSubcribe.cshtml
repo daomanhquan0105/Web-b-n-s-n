@@ -1,0 +1,48 @@
+﻿@using TongkhosonVn.Models;
+@model IEnumerable<ReceiveEmail>
+@{
+    ViewBag.Title = "Danh sách đăng ký email";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Danh sách đăng ký email</h2>
+<table class="table table-bordered table-striped mt-4 mb-4 p-3 bg-white border shadow-sm">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-light">
+        @foreach (var email in Model)
+        {
+            <tr id="row-@email.Id">
+                <td>@email.Email</td>
+                <td>
+                    <button class="btn btn-warning" onclick="deleteSub(@email.Id)" title="Xóa"><i class="fal fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        function deleteSub(id) {
+            if (confirm("Bạn có chắc muốn xóa email đã chọn không?")) {
+                $.ajax({
+                    type: "Post",
+                    url: "/Admin/DeleteSubcribe",
+                    data: { id: id },
+                    success: function (res) {
+                        if (res === "True") {
+                            alert("Xóa thành công!");
+                            $("#row-" + id).fadeOut();
+                        }
+                        else {
+                            alert("Quá trình thực hiện không thành công. Vui lòng thử lại!");
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

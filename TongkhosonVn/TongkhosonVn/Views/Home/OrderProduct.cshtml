@@ -1,0 +1,107 @@
+﻿@using TongkhosonVn.Models;
+@using TongkhosonVn.ViewModel;
+@model OrderViewModel
+
+@{
+    ViewBag.Title = "Thông tin mua hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<form id="FormOrder">
+    <div class="container mt-3">
+        <div class="title text-center">
+            <h2> Thông tin mua hàng </h2> 
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-5">
+                <h2>Thông tin cá nhân</h2>
+                @Html.HiddenFor(model => model.ProductID)
+                <div class="form-group row mt-3">
+                    @Html.LabelFor(model => model.Member.FullName, htmlAttributes: new { @class = "col-form-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Member.FullName)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Member.Email, htmlAttributes: new { @class = "col-form-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Member.Email)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Member.Address, htmlAttributes: new { @class = "col-form-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Member.Address)
+                    </div>
+                </div>
+                 
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Member.Phone, htmlAttributes: new { @class = "col-form-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Member.Phone)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "col-form-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Quantity)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <button type="button" class="btn btn-block btn-primary" onclick="SubmitFormOrder()">
+                        Gửi thông tin mua hàng
+                    </button>
+                </div>
+            </div>
+            <div class="col-12 col-md-7 detail">
+                <div class="information ml-3 ml-xl-5">
+                    <h2>Thông tin sản phẩm</h2>
+                    <br />
+                    <div class="name mt-3">
+                        @Model.Product.Name
+                    </div>
+                    <img src="~/Images/Products/@Model.Product.Images.Split(';')[0]" class="img-fluid mb-2 mt-2" />
+                    <ul class="description">
+                        <li>
+                            <span>Mã sản phẩm :</span> <span>@Model.Product.Code</span>
+                        </li>
+                        <li>
+                            <span>Danh mục:</span> <span>@Model.Product.TradeMark.Name ngoại thất</span>
+                        </li>
+                    </ul>
+                    <div class="product-price">
+                        @Model.Product.Price.ToString("#,##")
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form> 
+@section scripts{
+    <script> 
+        function SubmitFormOrder() {
+            var formData = $("#FormOrder").serialize();
+            $.ajax({
+                type: "Post",
+                url: "/Home/OrderProduct",
+                data: formData,
+                success: function (res) {
+                    if (res) {
+                        alert("Bạn đã đặt hàng thành công!");
+                        window.location.href = "/Home/Index";
+                    }
+                    else {
+                        alert("Hãy nhập đúng định dạng email!");
+                    }
+                }
+            });
+        }
+    </script>    
+    
+}
